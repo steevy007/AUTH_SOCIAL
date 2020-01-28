@@ -7,3 +7,4 @@
 <!-- Material Design Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.12.0/css/mdb.min.css" rel="stylesheet">
 <link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="librairie/parsley/css/parsley.css">

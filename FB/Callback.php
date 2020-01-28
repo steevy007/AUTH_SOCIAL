@@ -36,9 +36,9 @@ $_SESSION['fb_token']=$accessToken;
 if($_SESSION['fb_token']){
     if(!verifyUser($_SESSION['fb_data']['email'])){
         AddUserSO($_SESSION['fb_data']['last_name'],$_SESSION['fb_data']['first_name'],$_SESSION['fb_data']['email'],$_SESSION['fb_data']['gender']);
-        header('Location:../update_profil.php');
+        header('Location:../update_profil.php?email='.$_SESSION['fb_data']['email']);
     }else{
-        header('Location:../home.php');
+        header("Location:../home.php?email=".$_SESSION['fb_data']['email']);
     }
 }else{
     header('Location:../index.php');

@@ -14,13 +14,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    
+    <style>
+        body{
+            background-image: radial-gradient(circle, rgba(128, 128, 128, 0.685), rgba(0, 0, 0, 0.712), black);
+        }
+    </style>
     <?php require_once 'style.php' ?>
     <title>Login</title>
 </head>
 <body>
     <div class="content">
-        <div class="col-md-6">
+        <div class="col-md-6 shadow p-3 mb-5 bg-white rounded">
             <!-- Default form login -->
 <form class="text-center border border-light p-5" action="#!">
 

@@ -1,5 +1,5 @@
 <?php
-require_once '../db_connect.php';
+require_once 'db_connect.php';
 //verification de l unicite des mail
 function verifyUser($email){
     global $conn;
@@ -18,3 +18,14 @@ function AddUserSO($nom,$prenom,$email,$sexe){
     $req->execute([$nom,$prenom,$email,$sexe,date('Y-m-d')]);
     
 }
+
+//selectionner les infos d un client en connaissant son email
+function searchbyMail($email){
+    global $conn;
+
+    $req=$conn->prepare('SELECT * FROM user WHERE email=?');
+    $req->execute([$email]);
+    return $req->fetch(PDO::FETCH_OBJ);
+}
+
+//fonction permettant de mettre a jour un utilisateur

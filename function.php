@@ -29,3 +29,29 @@ function searchbyMail($email){
 }
 
 //fonction permettant de mettre a jour un utilisateur
+function update_profil($nom,$prenom,$date,$sexe,$password,$email){
+    global $conn;
+    $req=$conn->prepare('UPDATE user set nom=?,prenom=?,Date_Naissance=?,sexe=?,password=? WHERE email=?');
+    $req->execute([$nom,$prenom,$date,$sexe,$password,$email]);
+
+}
+
+//function permettant de recuperer l'ancien mot de passe
+function oldPass($email){
+    global $conn;
+    $req=$conn->prepare('SELECT password FROM user WHERE email=?');
+    $req->execute([$email]);
+    return $req->fetch(PDO::FETCH_OBJ);
+}
+
+//fonction permettant de sauvegarder les donnee en cas d'erreur
+function saveData($nom,$prenom,$date,$sexe){
+    $data=[
+        'nom'=>$nom,
+        'prenom'=>$prenom,
+        'date'=>$date,
+        'sexe'=>$sexe
+    ];
+
+    return $data;
+}

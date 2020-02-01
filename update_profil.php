@@ -5,6 +5,39 @@ if(!isset($_SESSION['fb_data'])){
 }else{
     require_once 'function.php';
     $data=searchbyMail($_SESSION['fb_data']['email']);
+    $err=[];
+    $dataErr=[];
+    if(isset($_POST['sub'])){
+        extract($_POST);
+        if(empty($nom) and empty($prenom)){
+            $err[]='le nom et le prenom ne peut etre vide';
+        }
+
+
+        if($pass1!=$pass2){
+            $err[]='Mot de passe non identique';
+        }
+
+
+        if($dateN>=date('Y-m-d')){
+            $err[]='Date de Naissance invalide'; 
+        }
+
+
+
+        if(count($err)==0){
+            //echo $old_pass->password;
+            update_profil($nom,$prenom,$dateN,$sexe,$pass1,$_SESSION['fb_data']['email']);
+            header('Location:home.php');
+            
+        }else{
+            $dataErr[]=saveData($nom,$prenom,$dateN,$sexe);
+           //echo $dataErr[0]['nom'];
+            /*foreach($dataErr as $value){
+                var_dump($dataErr[0]['nom']);
+            }*/
+        }
+    }
 }
 
 $size = 40;
@@ -21,19 +54,19 @@ $grav_url = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $_SESSIO
 </head>
 <body>
     <div class="content">
-        <div class="col-md-8 ">
+        <div class="col-md-8 col-sm-12 ">
             <div class="row ">
-                <div class="col-md-4">
+                <div class="col-md-4 col-sm-12">
                     <div class="row">
                         <div class="col-md-12">
                             <img class="avatar" src="<?= $grav_url?>" alt="">
                         </div>
                     </div>
                 </div>
-                <div class="div col-md-8">
+                <div class="div col-md-8 col-sm-12">
                     <div class="row shadow p-3 mb-5 bg-white rounded">
                         <div class="col-md-12 ">
-                            <form action="" data-parsley-validate>
+                            <form method="POST"  data-parsley-validate>
                             <table class="table  table-borderless">
                                 <tbody>
                                     <tr>
@@ -41,7 +74,7 @@ $grav_url = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $_SESSIO
                                     <td>
                                         <!-- Material input -->
                                     <div class="md-form">
-                                    <input value="<?= $data->nom?>" type="text" id="inputPrefilledEx" class="form-control" 
+                                    <input value="<?= isset($dataErr[0]['nom'])?$dataErr[0]['nom']:$data->nom?>" type="text" id="inputPrefilledEx" class="form-control" name="nom"
 data-parsley-required>
                                     </div>
                                     </td>
@@ -52,7 +85,7 @@ data-parsley-required>
                                     <td>
                                         <!-- Material input -->
                                     <div class="md-form">
-                                    <input value="<?= $data->prenom?>" type="text" id="inputPrefilledEx" class="form-control" 
+                                    <input value="<?= isset($dataErr[0]['prenom'])?$dataErr[0]['prenom']:$data->prenom?>" type="text" id="inputPrefilledEx" class="form-control" name="prenom" 
 data-parsley-required>
                                     </div>
                                     </td>
@@ -62,42 +95,28 @@ data-parsley-required>
                                     <td>
                                         <!-- Material input -->
                                     <div class="md-form">
-                                    <input value="<?= $data->date_Naissance?>" type="date" id="inputPrefilledEx" class="form-control">
+                                    <input value="<?= isset($dataErr[0]['date'])?$dataErr[0]['date']:$data->Date_Naissance?>" type="date" id="inputPrefilledEx" class="form-control" name="dateN">
                                     </div>
                                     </td>
                                     </tr>
 
                                     <td>sexe </td>
                                     <td>
-                                    <select class="browser-default custom-select">
-                                    <option value="<?$data->date_Naissance=='male'?:'selected'?>" >male</option>
-                                    <option value="<?$data->date_Naissance=='female'?:'selected'?>">female</option>
+                                    <select class="browser-default custom-select" name="sexe">
+                                    <option value="male" <?= $data->sexe=='male'?'selected':'' ?>>male</option>
+                                    <option value="female" <?= $data->sexe=='female'?'selected':'' ?>>female</option>
                                     </select>
                                     </td>
                                     </tr>
 
-                                    <?php
-                                    if(!empty($data->password)){
-                                    ?>
-                                    <tr>
-                                    <td>Ancien Mot de passe</td>
-                                    <td>
-                                        <!-- Material input -->
-                                    <div class="md-form">
-                                    <input value="<?= $data->password?:''?>" type="password" id="inputPrefilledEx" class="form-control" >
-                                    </div>
-                                    </td>
-                                    </tr>
-                                    <?php
-                                    }
-                                    ?>
+                                   
 
                                     <tr>
                                     <td>Nouveau Password</td>
                                     <td>
                                         <!-- Material input -->
                                     <div class="md-form">
-                                    <input value="<?= $data->password?:''?>" type="password" id="pass2" class="form-control" data-parsley-length="[6, 10]" data-parsley-trigger="keyup">
+                                    <input value="" type="password" id="pass2" class="form-control" data-parsley-length="[6, 10]" data-parsley-trigger="keyup" name="pass1">
                                     </div>
                                     </td>
                                     </tr>
@@ -107,7 +126,7 @@ data-parsley-required>
                                     <td>
                                         <!-- Material input -->
                                     <div class="md-form">
-                                    <input value="" id="inputPrefilledEx" class="form-control" data-parsley-equalto="#pass2" data-parsley-trigger="keyup">
+                                    <input value="" id="inputPrefilledEx" class="form-control" data-parsley-equalto="#pass2" data-parsley-trigger="keyup" name="pass2">
                                     </div>
                                     </td>
                                     </tr>
@@ -116,11 +135,15 @@ data-parsley-required>
                         <div class="row">
                                 <div class="col-md-12 text-right">
                                     <?php
-                                    if(isset($_SESSION['err']) and !empty($_SESSION['err'])){
+                                    if(isset($err) and !empty($err)){
                                     ?>    
                                         <div class="alert alert-danger" role="alert">
-                                        
-                                </div>
+                                        <span><?php
+                                            foreach($err as $value){
+                                                echo "$value</br>";
+                                            }
+                                        ?></span>
+                                        </div>
                                     <?php
                                     }
                                     ?>
@@ -129,7 +152,7 @@ data-parsley-required>
                             </div>
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <input type="submit" class="btn btn-primary" value="Update">
+                                    <input type="submit" class="btn btn-primary" value="Update" name="sub">
                                     <a href="home.php" class="btn btn-dark">Annuler</a>
                                 </div>
                             </div>
